@@ -1,4 +1,3 @@
-```kotlin
 package com.offline.securitycam
 
 import android.Manifest
@@ -54,10 +53,6 @@ import java.util.*
 import java.util.concurrent.Executors
 import kotlin.math.abs
 
-// ============================================================================
-// 1. DATA MODELS & SYNCHRONIZED STATE PROTOCOL
-// ============================================================================
-
 enum class AppMode { UNSELECTED, CAMERA, MONITOR }
 enum class RecordingTarget { CAMERA_DEVICE, MONITOR_DEVICE }
 enum class StreamQuality(val label: String, val width: Int, val height: Int, val jpegQuality: Int) {
@@ -69,7 +64,7 @@ enum class StreamQuality(val label: String, val width: Int, val height: Int, val
 data class CameraConfig(
     val isArmed: Boolean = true,
     val motionDetectionEnabled: Boolean = true,
-    val preMotionBufferSeconds: Int = 10, // 5, 10, or 30
+    val preMotionBufferSeconds: Int = 10,
     val recordingTarget: RecordingTarget = RecordingTarget.CAMERA_DEVICE,
     val useFrontCamera: Boolean = false,
     val dualCameraEnabled: Boolean = false,
@@ -78,9 +73,9 @@ data class CameraConfig(
     val micEnabled: Boolean = true,
     val quality: StreamQuality = StreamQuality.MEDIUM,
     val scheduleEnabled: Boolean = false,
-    val scheduleStartHour: Int = 22, // 10 PM
+    val scheduleStartHour: Int = 22,
     val scheduleStartMinute: Int = 0,
-    val scheduleEndHour: Int = 6,   // 6 AM
+    val scheduleEndHour: Int = 6,
     val scheduleEndMinute: Int = 0,
     val isRecordingNow: Boolean = false,
     val motionDetectedNow: Boolean = false,
@@ -146,10 +141,6 @@ data class DiscoveredCamera(
     val isTrusted: Boolean
 )
 
-// ============================================================================
-// 2. PERSISTENT PREFERENCES & TRUST STORE (SINGLE-TIME PAIRING)
-// ============================================================================
-
 class SecurityPrefs(context: Context) {
     private val prefs = context.getSharedPreferences("offline_sec_prefs", Context.MODE_PRIVATE)
 
@@ -203,10 +194,6 @@ class SecurityPrefs(context: Context) {
     fun isTrusted(deviceId: String): Boolean = getTrustedDevices().containsKey(deviceId)
 }
 
-// ============================================================================
-// 3. CIRCULAR PRE-MOTION RING BUFFER (5s, 10s, 30s)
-// ============================================================================
-
 data class BufferedFrame(
     val jpegBytes: ByteArray,
     val timestampMs: Long,
@@ -240,10 +227,6 @@ class PreMotionRingBuffer {
         synchronized(lock) { frames.clear() }
     }
 }
-
-// ============================================================================
-// 4. OFFLINE LAN TCP SERVER & DISCOVERY (CAMERA SIDE)
-// ============================================================================
 
 object SecurityStateHolder {
     val configFlow = MutableStateFlow(CameraConfig())
@@ -442,10 +425,6 @@ class CameraNetworkServer(
         scope.cancel()
     }
 }
-
-// ============================================================================
-// 5. BACKGROUND CAMERA FOREGROUND SERVICE (WORKS WITH SCREEN OFF)
-// ============================================================================
 
 class SecurityCameraService : LifecycleService() {
 
@@ -851,10 +830,6 @@ class SecurityCameraService : LifecycleService() {
     }
 }
 
-// ============================================================================
-// 6. MONITOR CLIENT ENGINE (AUTO-DISCOVERY, TRUSTED AUTO-RECONNECT & REMOTE STORAGE)
-// ============================================================================
-
 class MonitorNetworkClient(
     private val context: Context,
     private val prefs: SecurityPrefs
@@ -1146,10 +1121,6 @@ class MonitorNetworkClient(
         scope.cancel()
     }
 }
-
-// ============================================================================
-// 7. JETPACK COMPOSE UI (MODE SELECTOR, CAMERA DASHBOARD, MONITOR CONTROLLER)
-// ============================================================================
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
